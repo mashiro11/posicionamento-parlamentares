@@ -1,0 +1,22 @@
+{
+  "files": {
+    "main.css": "/posicionamento-parlamentares/static/css/main.8c8b27cf.chunk.css",
+    "main.js": "/posicionamento-parlamentares/static/js/main.aceb502c.chunk.js",
+    "main.js.map": "/posicionamento-parlamentares/static/js/main.aceb502c.chunk.js.map",
+    "runtime-main.js": "/posicionamento-parlamentares/static/js/runtime-main.25e26699.js",
+    "runtime-main.js.map": "/posicionamento-parlamentares/static/js/runtime-main.25e26699.js.map",
+    "static/js/2.357287ab.chunk.js": "/posicionamento-parlamentares/static/js/2.357287ab.chunk.js",
+    "static/js/2.357287ab.chunk.js.map": "/posicionamento-parlamentares/static/js/2.357287ab.chunk.js.map",
+    "static/js/3.43a44801.chunk.js": "/posicionamento-parlamentares/static/js/3.43a44801.chunk.js",
+    "static/js/3.43a44801.chunk.js.map": "/posicionamento-parlamentares/static/js/3.43a44801.chunk.js.map",
+    "index.html": "/posicionamento-parlamentares/index.html",
+    "static/css/main.8c8b27cf.chunk.css.map": "/posicionamento-parlamentares/static/css/main.8c8b27cf.chunk.css.map",
+    "static/js/2.357287ab.chunk.js.LICENSE.txt": "/posicionamento-parlamentares/static/js/2.357287ab.chunk.js.LICENSE.txt"
+  },
+  "entrypoints": [
+    "static/js/runtime-main.25e26699.js",
+    "static/js/2.357287ab.chunk.js",
+    "static/css/main.8c8b27cf.chunk.css",
+    "static/js/main.aceb502c.chunk.js"
+  ]
+}
