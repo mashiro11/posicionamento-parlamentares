@@ -11,6 +11,7 @@ const App = (props) => {
     if(pos){
       deputado.posicao = pos.posicao
       deputado.tel = pos.Telefone
+      deputado.evidencia = pos.evidencia
     }
     return deputado
   }

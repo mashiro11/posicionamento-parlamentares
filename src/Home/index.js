@@ -9,7 +9,7 @@ import Tab from '@material-ui/core/Tab'
 import { estados } from '../auxData.js'
 
 const Home = ({deputados, partidos}) => {
-  const [state, setState] = React.useState({noShowPartido: [], noShowEstado:[], groupBy: 0, groups: ['', 'estado', 'partido', 'posicionamento'], searchDeputado: ''})
+  const [state, setState] = React.useState({noShowPartido: [], noShowEstado:[], groupBy: 0, groups: ['posicionamento', 'estado', 'partido', ''], searchDeputado: ''})
 
   const onPartidoSelect = (partido) =>
     setState({...state, noShowPartido: [...state.noShowPartido.filter( noS => partido !== noS)] })
@@ -27,11 +27,30 @@ const Home = ({deputados, partidos}) => {
     setState({...state, groupBy: value})
 
   const onSearchChange = (e) =>
-    setState({...state, searchDeputado: e.target.value})
+    setState({...state, searchDeputado: e.target.value.toLowerCase()})
 
   const style = {
     display: 'flex', flexWrap: 'wrap',
     justifyContent: 'space-around'
+  }
+
+  const filterDeputados = (pos, deputados) => {
+    let filtered = deputados
+      .filter( deputado => !state.noShowPartido.find( noS => noS === deputado.siglaPartido))
+      .filter( deputado => !state.noShowEstado.find( noS => noS === deputado.siglaUf))
+      .filter( deputado => pos.pos === deputado.posicao)
+      .filter( deputado => state.searchDeputado === '' || deputado.nome.toLowerCase().includes(state.searchDeputado) )
+
+      return(
+        <div>
+          <div>{pos.title}: {filtered.length}</div>
+          <div style={style}>
+            {filtered.map( (deputado, index) =>
+              <Deputado key={index} deputado={deputado} />
+            )}
+          </div>
+        </div>
+      )
   }
 
   return(
@@ -76,34 +95,28 @@ const Home = ({deputados, partidos}) => {
       </div>
 
       <Tabs value={state.groupBy} onChange={handleGroupBy}>
-        <Tab label='Não agrupar'/>
+        <Tab label='Posicionamento no Impeachment'/>
         <Tab label='Estado'/>
         <Tab label='Partido'/>
-        <Tab label='Posicionamento no Impeachment'/>
+        <Tab label='Não agrupar'/>
       </Tabs>
 
       { (function groupBy(groupBy){
           switch(state.groups[groupBy]){
             case 'posicionamento':
               return (
-                <div style={style}>
-                  {['contrario', 'favoravel', 'none']
-                    .map((pos, index) =>
-                      <div key={index} style={{maxWidth: '33%'}}>
-                        <div>Fonte: <a href='https://datastudio.google.com/u/0/reporting/26c8c95c-175f-4ca3-888d-0bfbccf73e1b/page/5KGxB'>Placar do Impeachment</a> </div>
-                        <div>{pos}</div>
-                        <div style={style}>
-                          {deputados
-                            .filter( deputado => !state.noShowPartido.find( noS => noS === deputado.siglaPartido))
-                            .filter( deputado => !state.noShowEstado.find( noS => noS === deputado.siglaUf))
-                            .filter( deputado => pos === deputado.posicao)
-                            .filter( deputado => state.searchDeputado === '' || deputado.nome.includes(state.searchDeputado) )
-                            .map( (deputado, index) =>
-                              <Deputado key={index} deputado={deputado} />
-                          )}
+                <div>
+                  <div>Fonte: <a href='https://datastudio.google.com/u/0/reporting/26c8c95c-175f-4ca3-888d-0bfbccf73e1b/page/5KGxB'>Placar do Impeachment</a> </div>
+                  <div style={style}>
+                    {[{pos: 'contrario', title: 'CONTRÁRIOS' },
+                      {pos:'favoravel', title: 'FAVORÁVEIS'},
+                      {pos:'none', title: 'SEM DEFINIÇÃO'}]
+                      .map((pos, index) =>
+                        <div key={index} style={{maxWidth: '33%'}}>
+                          {filterDeputados(pos, deputados)}
                         </div>
-                      </div>
-                  )}
+                    )}
+                  </div>
                 </div>
               )
             case 'estado':
@@ -118,7 +131,7 @@ const Home = ({deputados, partidos}) => {
                           {deputados
                             .filter( deputado => !state.noShowPartido.find((noS) => noS === deputado.siglaPartido))
                             .filter( deputado => estado.sigla === deputado.siglaUf)
-                            .filter( deputado => state.searchDeputado === '' || deputado.nome.includes(state.searchDeputado) )
+                            .filter( deputado => state.searchDeputado === '' || deputado.nome.toLowerCase().includes(state.searchDeputado) )
                             .map( (deputado, index) =>
                               <Deputado key={index} deputado={deputado} />)}
                         </div>
@@ -138,7 +151,7 @@ const Home = ({deputados, partidos}) => {
                             {deputados
                               .filter( deputado  => partido.sigla === deputado.siglaPartido)
                               .filter( deputado  => !state.noShowEstado.find((noS) => noS === deputado.siglaUf))
-                              .filter( deputado => state.searchDeputado === '' || deputado.nome.includes(state.searchDeputado) )
+                              .filter( deputado => state.searchDeputado === '' || deputado.nome.toLowerCase().includes(state.searchDeputado) )
                               .map( (deputado, index) =>
                               <Deputado key={index} deputado={deputado} />)}
                           </div>
@@ -152,7 +165,7 @@ const Home = ({deputados, partidos}) => {
                   {deputados
                     .filter( deputado => !state.noShowPartido.find((noS) => noS === deputado.siglaPartido))
                     .filter( deputado => !state.noShowEstado.find((noS) => noS === deputado.siglaUf))
-                    .filter( deputado => state.searchDeputado === '' || deputado.nome.includes(state.searchDeputado) )
+                    .filter( deputado => state.searchDeputado === '' || deputado.nome.toLowerCase().includes(state.searchDeputado) )
                     .map((deputado, index) =>
                       <Deputado key={index} deputado={deputado} />)}
                 </div>

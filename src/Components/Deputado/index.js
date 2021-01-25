@@ -22,6 +22,9 @@ const Deputado = ({deputado}) => {
       <div>
           <div>{deputado.nome}</div>
           <div>{deputado.siglaPartido} - {deputado.siglaUf}</div>
+          {deputado.evidencia &&
+            <a href={deputado.evidencia}>Evidencia do posicionamento</a>
+          }
           <div>{deputado.tel}</div>
         <div>{deputado.email}</div>
       </div>
