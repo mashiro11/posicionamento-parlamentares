@@ -25,6 +25,11 @@ const App = (props) => {
       request(`partidos?pagina=${state.partidoPage}&itens=15`, (data) => setState({...state, partidos: [...state.partidos, ...data], partidoPage: state.partidoPage + 1}), (error) => setState({...state, error: error}))
   })
 
+  React.useEffect( () => {
+    if(!state.orgaos && state.deputados.length > 0 && state.partidoPage === 4)
+      request('orgaos', (data) => setState({...state, orgaos: data}), (error) => setState({...state, error: error}))
+  }, [])
+
   if(state.error)
     console.log(state.error)
 

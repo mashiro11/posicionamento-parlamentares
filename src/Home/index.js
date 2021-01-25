@@ -94,6 +94,7 @@ const Home = ({deputados, partidos}) => {
         </div>
       </div>
 
+      <h2>Entre em contato com os Deputados de seu Estado e cobre um posicionamento!</h2>
       <Tabs value={state.groupBy} onChange={handleGroupBy}>
         <Tab label='Posicionamento no Impeachment'/>
         <Tab label='Estado'/>
@@ -109,8 +110,8 @@ const Home = ({deputados, partidos}) => {
                   <div>Fonte: <a href='https://datastudio.google.com/u/0/reporting/26c8c95c-175f-4ca3-888d-0bfbccf73e1b/page/5KGxB'>Placar do Impeachment</a> </div>
                   <div style={style}>
                     {[{pos: 'contrario', title: 'CONTRÁRIOS' },
-                      {pos:'favoravel', title: 'FAVORÁVEIS'},
-                      {pos:'none', title: 'SEM DEFINIÇÃO'}]
+                      {pos:'none', title: 'SEM DEFINIÇÃO'},
+                      {pos:'favoravel', title: 'FAVORÁVEIS'},]
                       .map((pos, index) =>
                         <div key={index} style={{maxWidth: '33%'}}>
                           {filterDeputados(pos, deputados)}
