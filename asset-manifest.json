@@ -1,8 +1,8 @@
 {
   "files": {
     "main.css": "/posicionamento-parlamentares/static/css/main.8c8b27cf.chunk.css",
-    "main.js": "/posicionamento-parlamentares/static/js/main.aceb502c.chunk.js",
-    "main.js.map": "/posicionamento-parlamentares/static/js/main.aceb502c.chunk.js.map",
+    "main.js": "/posicionamento-parlamentares/static/js/main.24663f50.chunk.js",
+    "main.js.map": "/posicionamento-parlamentares/static/js/main.24663f50.chunk.js.map",
     "runtime-main.js": "/posicionamento-parlamentares/static/js/runtime-main.25e26699.js",
     "runtime-main.js.map": "/posicionamento-parlamentares/static/js/runtime-main.25e26699.js.map",
     "static/js/2.357287ab.chunk.js": "/posicionamento-parlamentares/static/js/2.357287ab.chunk.js",
@@ -17,6 +17,6 @@
     "static/js/runtime-main.25e26699.js",
     "static/js/2.357287ab.chunk.js",
     "static/css/main.8c8b27cf.chunk.css",
-    "static/js/main.aceb502c.chunk.js"
+    "static/js/main.24663f50.chunk.js"
   ]
 }
