@@ -17,12 +17,26 @@ const App = (props) => {
   }
 
   React.useEffect( () => {
-    request('deputados', (data) => setState({...state, deputados: data.map( deputado => addPosicao(deputado) ) }), (error) => setState({...state, error: error}))
+    request('deputados',
+            (data) =>
+              setState({...state, deputados: data.map( deputado => addPosicao(deputado) ) }),
+            (error) => setState({...state, error: {...state.error, ...error}})
+          )
   }, [])
+  React.useEffect( () => {
+    if(state.deputados.length > 0 && !state.mesaDiretora)
+      request('orgaos/4/membros',
+              (data) => setState({...state, mesaDiretora: data}),
+              (error) => setState({...state, error: {...state.error, ...error}})
+            )
+  })
 
   React.useEffect( () => {
     if(state.deputados.length > 0 && state.partidoPage < 4)
-      request(`partidos?pagina=${state.partidoPage}&itens=15`, (data) => setState({...state, partidos: [...state.partidos, ...data], partidoPage: state.partidoPage + 1}), (error) => setState({...state, error: error}))
+      request(`partidos?pagina=${state.partidoPage}&itens=15`,
+              (data) => setState({...state, partidos: [...state.partidos, ...data], partidoPage: state.partidoPage + 1}),
+              (error) => setState({...state, error: error})
+              )
   })
 
   React.useEffect( () => {
@@ -35,7 +49,7 @@ const App = (props) => {
 
   return (
     <div className="App">
-      <Home deputados={state.deputados} partidos={state.partidos}/>
+      <Home deputados={state.deputados} partidos={state.partidos} mesaDiretora={state.mesaDiretora}/>
     </div>
   );
 }

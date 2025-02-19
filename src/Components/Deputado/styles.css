@@ -1,0 +1,16 @@
+.container {
+  display: flex;
+  text-align: left;
+  margin: 5;
+}
+
+.retrato{
+  width: 80;
+  text-align: center;
+  border: none
+}
+
+.hoverable :hover {
+  background-color: #FFFFFF;
+  cursor: pointer
+}
