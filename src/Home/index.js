@@ -1,5 +1,7 @@
 import React from 'react'
 import Deputado from '../Components/Deputado'
+import RepresentationBox from '../Components/RepresentationBox'
+import MesaDiretora from '../Components/MesaDiretora'
 import UsableChip from '../Components/UsableChip'
 
 import Chip from '@material-ui/core/Chip'
@@ -22,27 +24,38 @@ const Home = ({deputados, partidos, mesaDiretora}) => {
     deputadosPorPartido: []
   })
 
+  const colors = ["#72cb26", "#345718", "#e68d8d", "#7d1e1e","#d6ab4d", 
+                  "#694e10", "#c1c920", "#7d8226", "#638224", "#97bd4c", 
+                  "#1d6910", "#24a390", "#17edd0", "#11c0db", "#5a8991",
+                  "#075ab8", "#63a2eb", "#08356b", "#545699", "#9495e0",
+                  "#472894", "#675c80", "#9241d1", "#410073", "#9f46b5",
+                  "#871875", "#857e84"
+                 ]
+
   React.useEffect(()=>{
     setState({...state,
       deputadosPorEstado: deputados.reduce((acc, deputado) => {
-                            let found = acc.find(a => a.estado === deputado.siglaUf)
+                            let found = acc.find(a => a.title === deputado.siglaUf)
                             if(!found)
-                              return [...acc, {estado: deputado.siglaUf, count: 1}]
+                              return [...acc, {title: deputado.siglaUf, count: 1}]
                             else{
                               found.count += 1
                               return acc
                             }
                           } , []),
       deputadosPorPartido: deputados.reduce((acc, deputado) => {
-                            let found = acc.find(a => a.partido === deputado.siglaPartido)
+                            let found = acc.find(a => a.title === deputado.siglaPartido)
                             if(!found)
-                              return [...acc, {partido: deputado.siglaPartido, count: 1}]
+                              return [...acc, {title: deputado.siglaPartido, count: 1}]
                             else{
                               found.count += 1
                               return acc
                             }
                           } , [])
   })}, [deputados])
+
+  state.deputadosPorEstado.forEach( (group, index) => group.color = colors[index % colors.length]);
+  state.deputadosPorPartido.forEach( (group, index) => group.color = colors[index % colors.length]);
 
   const onPartidoSelect = (partido) =>
     setState({...state, noShowPartido: [...state.noShowPartido.filter( noS => partido !== noS)] })
@@ -129,24 +142,7 @@ const Home = ({deputados, partidos, mesaDiretora}) => {
           </div>
         </div>
         <div>
-          <div>
-            <h3>Comando da Câmara dos Deputados:</h3>
-            <div style={style}>
-              {mesaDiretora && mesaDiretora.map((deputado, index) =>
-                <div key={index}>
-                  <div>{deputado.titulo}</div>
-                  <div
-                    onMouseEnter={onDeputadoEnter(deputado)}
-                    onClick={onDeputadoClick(deputado)}
-                    onMouseLeave={onDeputadoExit}
-                    style={state.deputadoKept === deputado? {backgroundColor:  'white'} : {}}
-                  >
-                    <Deputado deputado={deputado}/>
-                  </div>
-                </div>
-              )}
-            </div>
-          </div>
+          <MesaDiretora mesaDiretora={mesaDiretora} onDeputadoEnter={onDeputadoEnter} onDeputadoClick={onDeputadoClick} onDeputadoExit={onDeputadoExit}/>
           <Tabs value={state.groupBy} onChange={handleGroupBy}>
             <Tab label='Estado'/>
             <Tab label='Partido'/>
@@ -197,12 +193,13 @@ const Home = ({deputados, partidos, mesaDiretora}) => {
                   case 'estado':
                     return (
                       <div>
+                        <RepresentationBox configList={state.deputadosPorEstado}/>
                         {estados
                           .filter( estado => !state.noShowEstado.find((noS) => noS === estado.sigla))
                           .map((estado, index) =>
                             <div key={index} style={{backgroundColor: index % 2 === 0? '#CCCCCC' : '#999999'}}>
                               <div>{estado.nome} ({estado.sigla}) {(() => {
-                                  let found = state.deputadosPorEstado.find( dE => dE.estado === estado.sigla)
+                                  let found = state.deputadosPorEstado.find( dE => dE.title === estado.sigla)
                                   return found? found.count : 0
                                 })()} Deputados</div>
                               <div style={style}>
@@ -227,12 +224,13 @@ const Home = ({deputados, partidos, mesaDiretora}) => {
                   case 'partido':
                     return (
                         <div>
+                          <RepresentationBox configList={state.deputadosPorPartido}/>
                           {partidos
                             .filter( partido => !state.noShowPartido.find((noS) => noS === partido.sigla))
                             .map((partido, index) =>
                               <div key={index} style={{backgroundColor: index % 2 === 0? '#CCCCCC' : '#999999'}}>
                                 <div>{partido.nome} ({partido.sigla}) {(() => {
-                                    let found = state.deputadosPorPartido.find( dP => dP.partido === partido.sigla)
+                                    let found = state.deputadosPorPartido.find( dP => dP.title === partido.sigla)
                                     return found? found.count : 0
                                   })()} Deputados</div>
                                 <div style={style}>

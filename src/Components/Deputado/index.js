@@ -4,13 +4,15 @@ import Paper from '@material-ui/core/Paper'
 import EmailIcon from '@material-ui/icons/Mail'
 import './styles.css'
 import Button from '@material-ui/core/Button'
+import Despesas from '../Despesas'
 
 const Deputado = (props) => {
   const {deputado, selected, detailed} = props
   const [state, setState] = React.useState()
   React.useEffect(()=>{
-    if(detailed)
+    if(detailed){
       request(`deputados/${deputado.id}`, (data) => setState({...state, deputado: data}), (error) => setState({...state, error: error}))
+    }
   },[])
   return(
     <Button onClick={props.onClick? props.onClick : null}>
@@ -23,6 +25,7 @@ const Deputado = (props) => {
           <div style={{fontSize: 12}}>{deputado.nomeCivil}</div>
           <div style={{fontSize: 14}}>{deputado.siglaPartido}</div>
           <div>{deputado.siglaUf}</div>
+          
         </div>
       :
         <div>
@@ -41,6 +44,7 @@ const Deputado = (props) => {
               <div>{deputado.tel}</div>
               <div>{deputado.email}</div>
           </div>
+          <Despesas id={deputado.id}/>
         </div>
       }
     </Button>
