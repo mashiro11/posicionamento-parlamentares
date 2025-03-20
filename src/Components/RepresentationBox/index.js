@@ -14,6 +14,7 @@ const RepresentationBox = ({configList}) => {
     const lines = boxHeight / elementHeight //15 linhas
     return(
         <div>
+            <div>Composição atual da Câmara dos Deputados</div>
             <svg width={boxWidth} height={boxHeight} style={{border: '2px solid black'}} xmlns="http://www.w3.org/2000/svg">
                 {createdList.map((value, index) =>
                     <rect key={index} x={(elementWidth* (index % columns))} y={elementHeight*( Math.floor(index / columns))} width={elementWidth} height={elementHeight} fill={value.color}>

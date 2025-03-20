@@ -7,7 +7,7 @@ import Button from '@material-ui/core/Button'
 import Despesas from '../Despesas'
 
 const Deputado = (props) => {
-  const {deputado, selected, detailed} = props
+  const {deputado, selected, detailed, onClose} = props
   const [state, setState] = React.useState()
   React.useEffect(()=>{
     if(detailed){
@@ -29,6 +29,7 @@ const Deputado = (props) => {
         </div>
       :
         <div>
+          <Button onClick={onClose}>Fechar</Button>
           <div className='retrato'>
             <div>
               <img src={deputado.urlFoto} style={{maxWidth: 150, borderRadius: 30}}/>
@@ -44,7 +45,7 @@ const Deputado = (props) => {
               <div>{deputado.tel}</div>
               <div>{deputado.email}</div>
           </div>
-          <Despesas id={deputado.id}/>
+          <Despesas id={deputado.id} uf={deputado.siglaUf}/>
         </div>
       }
     </Button>

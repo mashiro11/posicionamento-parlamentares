@@ -10,7 +10,7 @@ const MesaDiretora = ({mesaDiretora, onDeputadoEnter, onDeputadoClick, onDeputad
         <div>
             <h3>Comando da Câmara dos Deputados:</h3>
             <div style={style}>
-              {mesaDiretora && mesaDiretora.map((deputado, index) =>
+              {mesaDiretora && mesaDiretora.filter(deputado => deputado.titulo != "Titular").map((deputado, index) =>
                 <div key={index}>
                   <div>{deputado.titulo}</div>
                   <div

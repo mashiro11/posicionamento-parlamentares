@@ -80,10 +80,12 @@ const Home = ({deputados, partidos, mesaDiretora}) => {
     justifyContent: 'space-around'
   }
 
-  const onDeputadoEnter = (deputado) => () => setState({...state, deputadoDetailed: deputado })
+  const onDeputadoEnter = (deputado) => () => {}//setState({...state, deputadoDetailed: deputado })
 
   const onDeputadoExit = () => setState({...state, deputadoDetailed: state.deputadoKept })
   const onDeputadoClick = (deputado) => () => setState({...state, deputadoDetailed: deputado, deputadoKept: deputado})
+
+  const onDetailedClose = () => setState({...state, deputadoDetailed: {}, deputadoKept: {}})
 
   const onFilterChange = type => e => {
     switch(e.target.value){
@@ -123,10 +125,67 @@ const Home = ({deputados, partidos, mesaDiretora}) => {
         </div>
       )
   }
+
+  const organizeDeputadosPorEstado = () =>{
+    return estados
+      .filter( estado => !state.noShowEstado.find((noS) => noS === estado.sigla))
+      .map((estado, index) =>
+        <div key={index} style={{backgroundColor: index % 2 === 0? '#CCCCCC' : '#999999'}}>
+          <div>{estado.nome} ({estado.sigla}) {(() => {
+              let found = state.deputadosPorEstado.find( dE => dE.title === estado.sigla)
+              return found? found.count : 0
+            })()} Deputados</div>
+          <div style={style}>
+            {deputados
+              .filter( deputado => !state.noShowPartido.find((noS) => noS === deputado.siglaPartido))
+              .filter( deputado => estado.sigla === deputado.siglaUf)
+              .filter( deputado => state.searchDeputado === '' || deputado.nome.toLowerCase().includes(state.searchDeputado) )
+              .map( (deputado, index) =>
+                <div  key={index}
+                  onMouseEnter={onDeputadoEnter(deputado)}
+                  onClick={onDeputadoClick(deputado)}
+                  onMouseLeave={onDeputadoExit}
+                  style={state.deputadoKept === deputado? {backgroundColor:  'white'} : {}}
+                >
+                  <Deputado deputado={deputado} />
+                </div>)}
+          </div>
+        </div>
+    )
+  }
+
+  const organizeDeputadosPorPartido = () => {
+    return partidos
+      .filter( partido => !state.noShowPartido.find((noS) => noS === partido.sigla))
+      .map((partido, index) =>
+        <div key={index} style={{backgroundColor: index % 2 === 0? '#CCCCCC' : '#999999'}}>
+          <div>{partido.nome} ({partido.sigla}) {(() => {
+              let found = state.deputadosPorPartido.find( dP => dP.title === partido.sigla)
+              return found? found.count : 0
+            })()} Deputados</div>
+          <div style={style}>
+            {deputados
+              .filter( deputado  => partido.sigla === deputado.siglaPartido)
+              .filter( deputado  => !state.noShowEstado.find((noS) => noS === deputado.siglaUf))
+              .filter( deputado => state.searchDeputado === '' || deputado.nome.toLowerCase().includes(state.searchDeputado) )
+              .map( (deputado, index) =>
+                <div key={index}
+                  onMouseEnter={onDeputadoEnter(deputado)}
+                  onMouseLeave={onDeputadoExit}
+                  style={state.deputadoKept === deputado? {backgroundColor:  'white'} : {}}
+                >
+                  <Deputado key={index} deputado={deputado} onClick={onDeputadoClick(deputado)} />
+                </div>
+                )}
+          </div>
+        </div>
+    )
+  }
+
   return(
     <div>
       <h2>Entre em contato com os Deputados de seu Estado e cobre um posicionamento!</h2>
-      <div style={{display: 'grid', gridTemplateColumns: '150px auto 350px'}}>
+      <div style={{display: 'grid', gridTemplateColumns: `150px auto ${(Object.keys(state.deputadoDetailed).length? "550":"0")}px`}}>
         <div>
           <div>
             Em discussão
@@ -194,62 +253,14 @@ const Home = ({deputados, partidos, mesaDiretora}) => {
                     return (
                       <div>
                         <RepresentationBox configList={state.deputadosPorEstado}/>
-                        {estados
-                          .filter( estado => !state.noShowEstado.find((noS) => noS === estado.sigla))
-                          .map((estado, index) =>
-                            <div key={index} style={{backgroundColor: index % 2 === 0? '#CCCCCC' : '#999999'}}>
-                              <div>{estado.nome} ({estado.sigla}) {(() => {
-                                  let found = state.deputadosPorEstado.find( dE => dE.title === estado.sigla)
-                                  return found? found.count : 0
-                                })()} Deputados</div>
-                              <div style={style}>
-                                {deputados
-                                  .filter( deputado => !state.noShowPartido.find((noS) => noS === deputado.siglaPartido))
-                                  .filter( deputado => estado.sigla === deputado.siglaUf)
-                                  .filter( deputado => state.searchDeputado === '' || deputado.nome.toLowerCase().includes(state.searchDeputado) )
-                                  .map( (deputado, index) =>
-                                    <div  key={index}
-                                      onMouseEnter={onDeputadoEnter(deputado)}
-                                      onClick={onDeputadoClick(deputado)}
-                                      onMouseLeave={onDeputadoExit}
-                                      style={state.deputadoKept === deputado? {backgroundColor:  'white'} : {}}
-                                    >
-                                      <Deputado deputado={deputado} />
-                                    </div>)}
-                              </div>
-                            </div>
-                        )}
+                        {organizeDeputadosPorEstado()}
                       </div>
                     )
                   case 'partido':
                     return (
                         <div>
                           <RepresentationBox configList={state.deputadosPorPartido}/>
-                          {partidos
-                            .filter( partido => !state.noShowPartido.find((noS) => noS === partido.sigla))
-                            .map((partido, index) =>
-                              <div key={index} style={{backgroundColor: index % 2 === 0? '#CCCCCC' : '#999999'}}>
-                                <div>{partido.nome} ({partido.sigla}) {(() => {
-                                    let found = state.deputadosPorPartido.find( dP => dP.title === partido.sigla)
-                                    return found? found.count : 0
-                                  })()} Deputados</div>
-                                <div style={style}>
-                                  {deputados
-                                    .filter( deputado  => partido.sigla === deputado.siglaPartido)
-                                    .filter( deputado  => !state.noShowEstado.find((noS) => noS === deputado.siglaUf))
-                                    .filter( deputado => state.searchDeputado === '' || deputado.nome.toLowerCase().includes(state.searchDeputado) )
-                                    .map( (deputado, index) =>
-                                      <div key={index}
-                                        onMouseEnter={onDeputadoEnter(deputado)}
-                                        onMouseLeave={onDeputadoExit}
-                                        style={state.deputadoKept === deputado? {backgroundColor:  'white'} : {}}
-                                      >
-                                        <Deputado key={index} deputado={deputado} onClick={onDeputadoClick(deputado)} />
-                                      </div>
-                                      )}
-                                </div>
-                              </div>
-                          )}
+                          {organizeDeputadosPorPartido()}
                         </div>
                     )
                   default:
@@ -268,7 +279,7 @@ const Home = ({deputados, partidos, mesaDiretora}) => {
           </div>
         </div>
         <div>
-          <Deputado deputado={state.deputadoDetailed} detailed/>
+          <Deputado deputado={state.deputadoDetailed} detailed onClose={onDetailedClose}/>
         </div>
       </div>
     </div>
