@@ -30,7 +30,7 @@ const DeputadoListItem = ({deputado, selected, detailed, onClose, requestDespesa
                 <div>Despesa: {despesaResumo.start}-{despesaResumo.end}</div>
                 <div>{formater.format(despesaResumo.total)}</div>
             </div>
-            : <div>Baixando despesas...<br/></div>
+            : <div>Baixando despesas...({deputado.progress? Math.floor(100*deputado.progress) : 0 }%)<br/></div>
         }
       </div>
     </Button>

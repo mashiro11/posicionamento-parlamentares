@@ -72,14 +72,16 @@ const App = (props) => {
         {
           const despesas = deputados[downloadingDeputadoIndex].despesas? deputados[downloadingDeputadoIndex].despesas : []
             deputados[downloadingDeputadoIndex].despesas = [...despesas, ...data]
+            deputados[downloadingDeputadoIndex].progress = (loadPageInfo.lastPageReceived) / loadPageInfo.lastPageIndex
+
             setLoadPageInfo({...loadPageInfo, lastPageReceived: loadPageInfo.lastPageReceived + 1})
         })
     else{
       const deputadoUpdate = deputados[downloadingDeputadoIndex]
       deputadoUpdate.despesasDownloaded = true
-      setDeputados([deputadoUpdate, ...deputados.filter(d => d.id !== deputadoUpdate.id)])
+      setDeputados([...deputados.slice(0, downloadingDeputadoIndex), deputadoUpdate, ...deputados.slice(downloadingDeputadoIndex + 1, deputados.length)])
       if(downloadingDeputadoIndex < deputados.length){
-        //setDownloadingDeputadoIndex(downloadingDeputadoIndex + 1)
+        setDownloadingDeputadoIndex(downloadingDeputadoIndex + 1)
       }
     }
   }, [loadPageInfo])
