@@ -17,18 +17,20 @@ const DeputadoListItem = ({deputado, selected, detailed, onClose, requestDespesa
         : {total: 0, start: 9999, end: 0}
 
     return(
-    <Button onClick={onClick? onClick: null}>
+    <Button onClick={onClick? onClick : null}>
       <div className='retrato'>
         <div>
           <img src={deputado.urlFoto} style={{maxWidth: 70, borderRadius: 30}}/>
         </div>
         <div style={{fontSize: 12}}>{deputado.nome}</div>
         <div style={{fontSize: 12}}>{deputado.nomeCivil}</div>
-        <div style={{fontSize: 14}}>{deputado.siglaPartido}</div>
-        <div>{deputado.siglaUf}</div>
+        <div style={{fontSize: 14}}>{deputado.siglaPartido} - {deputado.siglaUf}</div>
         {deputado.despesasDownloaded ?
-            <div>Despesa: {formater.format(despesaResumo.total)} {despesaResumo.start}-{despesaResumo.end}</div>
-            : <div>Baixando despesas...</div>
+            <div>
+                <div>Despesa: {despesaResumo.start}-{despesaResumo.end}</div>
+                <div>{formater.format(despesaResumo.total)}</div>
+            </div>
+            : <div>Baixando despesas...<br/></div>
         }
       </div>
     </Button>
