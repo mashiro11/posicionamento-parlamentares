@@ -1,6 +1,7 @@
 import axios from 'axios'
 
 const request = (where, handleData, handleError) => {
+  console.trace('request', where)
   return axios.get(`https://dadosabertos.camara.leg.br/api/v2/${where}`)
   .then( response => {
     console.log('response:', response)

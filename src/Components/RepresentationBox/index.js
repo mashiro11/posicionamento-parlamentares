@@ -1,7 +1,7 @@
 const RepresentationBox = ({configList}) => {
     const createdList = []
     for(let i = 0; i < configList.length; i++){
-        for(let j = 0; j < configList[i].count; j++){
+        for(let j = 0; j < configList[i].list.length; j++){
             createdList.push({color: configList[i].color, title: configList[i].title})
         }
     }
@@ -18,7 +18,7 @@ const RepresentationBox = ({configList}) => {
             <svg width={boxWidth} height={boxHeight} style={{border: '2px solid black'}} xmlns="http://www.w3.org/2000/svg">
                 {createdList.map((value, index) =>
                     <rect key={index} x={(elementWidth* (index % columns))} y={elementHeight*( Math.floor(index / columns))} width={elementWidth} height={elementHeight} fill={value.color}>
-                        {value.title && <title>{value.title}: {configList.find(c => c.title === value.title).count}</title>}
+                        {value.title && <title>{value.title}: {configList.find(c => c.title === value.title).list.length}</title>}
                     </rect>
                 )}
             </svg>

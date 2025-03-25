@@ -34,7 +34,7 @@ const DespesaDetalhada = ({despesa: detalhamento}) => {
                 }
             </div>
             <div>
-                <Typography component="span">Valor: {formater.format(detalhamento.valorLiquido)}</Typography>
+                <Typography component="span" style={{fontWeight: "bold"}}>Valor: {formater.format(detalhamento.valorLiquido)}</Typography>
             </div>
             <div>
                 {detalhamento.urlDocumento?

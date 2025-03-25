@@ -1,5 +1,6 @@
 import React from 'react'
 import Deputado from '../Components/Deputado'
+import DeputadoListItem from '../Components/DeputadoListItem'
 import RepresentationBox from '../Components/RepresentationBox'
 import MesaDiretora from '../Components/MesaDiretora'
 import UsableChip from '../Components/UsableChip'
@@ -10,6 +11,8 @@ import Tab from '@material-ui/core/Tab'
 import Button from '@material-ui/core/Button'
 
 import { estados } from '../auxData.js'
+import GroupDeputados from '../Components/GroupDeputados/GroupDeputados.js'
+import fs from 'fs'
 
 const Home = ({deputados, partidos, mesaDiretora}) => {
   const [state, setState] = React.useState({
@@ -24,6 +27,10 @@ const Home = ({deputados, partidos, mesaDiretora}) => {
     deputadosPorPartido: []
   })
 
+  const [allData, setAllData] = React.useState("")
+
+  const [orderBy, setOrderEstadoBy] = React.useState(0)
+
   const colors = ["#72cb26", "#345718", "#e68d8d", "#7d1e1e","#d6ab4d", 
                   "#694e10", "#c1c920", "#7d8226", "#638224", "#97bd4c", 
                   "#1d6910", "#24a390", "#17edd0", "#11c0db", "#5a8991",
@@ -37,25 +44,23 @@ const Home = ({deputados, partidos, mesaDiretora}) => {
       deputadosPorEstado: deputados.reduce((acc, deputado) => {
                             let found = acc.find(a => a.title === deputado.siglaUf)
                             if(!found)
-                              return [...acc, {title: deputado.siglaUf, count: 1}]
+                              return [...acc, {title: deputado.siglaUf, name: estados.find(e => e.sigla === deputado.siglaUf).nome, list: [deputado], color: colors[acc.length % colors.length]}]
                             else{
-                              found.count += 1
+                              found.list.push(deputado)
                               return acc
                             }
                           } , []),
       deputadosPorPartido: deputados.reduce((acc, deputado) => {
                             let found = acc.find(a => a.title === deputado.siglaPartido)
                             if(!found)
-                              return [...acc, {title: deputado.siglaPartido, count: 1}]
+                              return [...acc, {title: deputado.siglaPartido, list: [deputado], color: colors[acc.length % colors.length]}]
                             else{
-                              found.count += 1
+                              found.list.push(deputado)
                               return acc
                             }
                           } , [])
-  })}, [deputados])
-
-  state.deputadosPorEstado.forEach( (group, index) => group.color = colors[index % colors.length]);
-  state.deputadosPorPartido.forEach( (group, index) => group.color = colors[index % colors.length]);
+    })
+  }, [deputados])
 
   const onPartidoSelect = (partido) =>
     setState({...state, noShowPartido: [...state.noShowPartido.filter( noS => partido !== noS)] })
@@ -71,6 +76,9 @@ const Home = ({deputados, partidos, mesaDiretora}) => {
 
   const handleGroupBy = (event, value) =>
     setState({...state, groupBy: value})
+
+  const handleOrderBy = (event, value) =>
+    setOrderEstadoBy(value)
 
   const onSearchChange = (e) =>
     setState({...state, searchDeputado: e.target.value.toLowerCase()})
@@ -126,66 +134,84 @@ const Home = ({deputados, partidos, mesaDiretora}) => {
       )
   }
 
-  const organizeDeputadosPorEstado = () =>{
-    return estados
-      .filter( estado => !state.noShowEstado.find((noS) => noS === estado.sigla))
-      .map((estado, index) =>
-        <div key={index} style={{backgroundColor: index % 2 === 0? '#CCCCCC' : '#999999'}}>
-          <div>{estado.nome} ({estado.sigla}) {(() => {
-              let found = state.deputadosPorEstado.find( dE => dE.title === estado.sigla)
-              return found? found.count : 0
-            })()} Deputados</div>
-          <div style={style}>
-            {deputados
-              .filter( deputado => !state.noShowPartido.find((noS) => noS === deputado.siglaPartido))
-              .filter( deputado => estado.sigla === deputado.siglaUf)
-              .filter( deputado => state.searchDeputado === '' || deputado.nome.toLowerCase().includes(state.searchDeputado) )
-              .map( (deputado, index) =>
-                <div  key={index}
-                  onMouseEnter={onDeputadoEnter(deputado)}
-                  onClick={onDeputadoClick(deputado)}
-                  onMouseLeave={onDeputadoExit}
-                  style={state.deputadoKept === deputado? {backgroundColor:  'white'} : {}}
-                >
-                  <Deputado deputado={deputado} />
-                </div>)}
-          </div>
-        </div>
-    )
+  const applySort = (groupByList) => {
+    return groupByList.toSorted( (a, b) => {
+      switch(orderBy){
+        case 0:
+          return a.name > b.name? 1 : (b.name > a.name? -1 : 0)
+        case 1:
+          return b.list.length - a.list.length 
+      } 
+    })
   }
 
-  const organizeDeputadosPorPartido = () => {
-    return partidos
-      .filter( partido => !state.noShowPartido.find((noS) => noS === partido.sigla))
-      .map((partido, index) =>
-        <div key={index} style={{backgroundColor: index % 2 === 0? '#CCCCCC' : '#999999'}}>
-          <div>{partido.nome} ({partido.sigla}) {(() => {
-              let found = state.deputadosPorPartido.find( dP => dP.title === partido.sigla)
-              return found? found.count : 0
-            })()} Deputados</div>
-          <div style={style}>
-            {deputados
-              .filter( deputado  => partido.sigla === deputado.siglaPartido)
-              .filter( deputado  => !state.noShowEstado.find((noS) => noS === deputado.siglaUf))
-              .filter( deputado => state.searchDeputado === '' || deputado.nome.toLowerCase().includes(state.searchDeputado) )
-              .map( (deputado, index) =>
-                <div key={index}
-                  onMouseEnter={onDeputadoEnter(deputado)}
-                  onMouseLeave={onDeputadoExit}
-                  style={state.deputadoKept === deputado? {backgroundColor:  'white'} : {}}
-                >
-                  <Deputado key={index} deputado={deputado} onClick={onDeputadoClick(deputado)} />
-                </div>
+  const applyDeputadoFilters = (deputados) => {
+    return deputados.filter(d => d.nome.includes)
+  }
+
+  const showDeputadosByCriteria = (criteria) => {
+      let sorted
+      switch(criteria){
+        case 'posicionamento':
+          return (
+            <div>
+              <div>Fonte: <a href='https://datastudio.google.com/u/0/reporting/26c8c95c-175f-4ca3-888d-0bfbccf73e1b/page/5KGxB'>Placar do Impeachment</a> </div>
+              <div style={style}>
+                {[{pos: 'contrario', title: 'CONTRÁRIOS' },
+                  {pos:'none', title: 'SEM DEFINIÇÃO'},
+                  {pos:'favoravel', title: 'FAVORÁVEIS'},]
+                  .map((pos, index) =>
+                    <div key={index} style={{maxWidth: '33%', backgroundColor: pos.pos==='contrario' ? '#eeaaaa' : pos.pos === 'favoravel' ? '#aaaaee' : '#dddddd'}}>
+                      {filterDeputados(pos, deputados)}
+                    </div>
                 )}
-          </div>
-        </div>
-    )
+              </div>
+            </div>
+          )
+        case 'estado':
+          sorted = applySort(state.deputadosPorEstado)
+          return (
+            <div>
+              <RepresentationBox configList={sorted}/>
+              {sorted.map((group, index) =>
+                <GroupDeputados key={index} index={index} group={group} onDeputadoMouseEnter={onDeputadoEnter} onDeputadoMouseExit={onDeputadoExit} onDeputadoClick={onDeputadoClick} style={style}/>
+              )}
+            </div>
+          )
+        case 'partido':
+          sorted = applySort(state.deputadosPorPartido);
+          return (
+              <div>
+                <RepresentationBox configList={sorted}/>
+                {sorted.map((group, index) => 
+                  <GroupDeputados key={index} index={index} group={group} onDeputadoMouseEnter={onDeputadoEnter} onDeputadoMouseExit={onDeputadoExit} onDeputadoClick={onDeputadoClick} style={style}/>
+                )}
+              </div>
+          )
+        default:
+          return (
+            <div style={style}>
+              {deputados
+                .filter( deputado => !state.noShowPartido.find((noS) => noS === deputado.siglaPartido))
+                .filter( deputado => !state.noShowEstado.find((noS) => noS === deputado.siglaUf))
+                .filter( deputado => state.searchDeputado === '' || deputado.nome.toLowerCase().includes(state.searchDeputado) )
+                .map((deputado, index) =>
+                  <DeputadoListItem key={index} deputado={deputado} onClick={() => onDeputadoClick(deputado)}/>)}
+            </div>
+          )
+    }
+  }
+
+  const onSaveDataToJson = () => {
+    setAllData(JSON.stringify(deputados), null, 2)
   }
 
   return(
     <div>
+      <Button onClick={onSaveDataToJson}>Salvar em json</Button>
       <h2>Entre em contato com os Deputados de seu Estado e cobre um posicionamento!</h2>
-      <div style={{display: 'grid', gridTemplateColumns: `150px auto ${(Object.keys(state.deputadoDetailed).length? "550":"0")}px`}}>
+      <div style={{display: 'grid', gridTemplateColumns: `auto ${(Object.keys(state.deputadoDetailed).length? "550":"0")}px`}}>
+        {/*
         <div>
           <div>
             Em discussão
@@ -200,12 +226,19 @@ const Home = ({deputados, partidos, mesaDiretora}) => {
             )}
           </div>
         </div>
+        */}
         <div>
           <MesaDiretora mesaDiretora={mesaDiretora} onDeputadoEnter={onDeputadoEnter} onDeputadoClick={onDeputadoClick} onDeputadoExit={onDeputadoExit}/>
           <Tabs value={state.groupBy} onChange={handleGroupBy}>
             <Tab label='Estado'/>
             <Tab label='Partido'/>
+            <Tab label='Todos'/>
           </Tabs>
+          <Tabs value={orderBy} onChange={handleOrderBy}>
+            <Tab label='A-Z'/>
+            <Tab label='Quantidade de Deputados'/>
+          </Tabs>
+          {/*
           <span>
             Filtros:
             <select style={{maxWidth: '33%'}} onChange={onFilterChange("Partido")}>
@@ -228,59 +261,19 @@ const Home = ({deputados, partidos, mesaDiretora}) => {
             </select>
             <input type='text' value={state.searchDeputado} onChange={onSearchChange} placeholder='Nome do deputado'/>
           </span>
+          */}
 
           <div>
             <h3>Todos os deputados:</h3>
-            {deputados && (function groupBy(groupBy){
-                switch(state.groups[groupBy]){
-                  case 'posicionamento':
-                    return (
-                      <div>
-                        <div>Fonte: <a href='https://datastudio.google.com/u/0/reporting/26c8c95c-175f-4ca3-888d-0bfbccf73e1b/page/5KGxB'>Placar do Impeachment</a> </div>
-                        <div style={style}>
-                          {[{pos: 'contrario', title: 'CONTRÁRIOS' },
-                            {pos:'none', title: 'SEM DEFINIÇÃO'},
-                            {pos:'favoravel', title: 'FAVORÁVEIS'},]
-                            .map((pos, index) =>
-                              <div key={index} style={{maxWidth: '33%', backgroundColor: pos.pos==='contrario' ? '#eeaaaa' : pos.pos === 'favoravel' ? '#aaaaee' : '#dddddd'}}>
-                                {filterDeputados(pos, deputados)}
-                              </div>
-                          )}
-                        </div>
-                      </div>
-                    )
-                  case 'estado':
-                    return (
-                      <div>
-                        <RepresentationBox configList={state.deputadosPorEstado}/>
-                        {organizeDeputadosPorEstado()}
-                      </div>
-                    )
-                  case 'partido':
-                    return (
-                        <div>
-                          <RepresentationBox configList={state.deputadosPorPartido}/>
-                          {organizeDeputadosPorPartido()}
-                        </div>
-                    )
-                  default:
-                    return (
-                      <div style={style}>
-                        {deputados
-                          .filter( deputado => !state.noShowPartido.find((noS) => noS === deputado.siglaPartido))
-                          .filter( deputado => !state.noShowEstado.find((noS) => noS === deputado.siglaUf))
-                          .filter( deputado => state.searchDeputado === '' || deputado.nome.toLowerCase().includes(state.searchDeputado) )
-                          .map((deputado, index) =>
-                            <Deputado key={index} deputado={deputado} />)}
-                      </div>
-                    )
-              }
-            })(state.groupBy)}
+            {deputados && showDeputadosByCriteria(state.groups[state.groupBy])}
           </div>
         </div>
         <div>
           <Deputado deputado={state.deputadoDetailed} detailed onClose={onDetailedClose}/>
         </div>
+      </div>
+      <div>
+        {allData}
       </div>
     </div>
   )

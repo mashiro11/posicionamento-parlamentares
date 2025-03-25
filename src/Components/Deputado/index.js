@@ -7,7 +7,7 @@ import Button from '@material-ui/core/Button'
 import Despesas from '../Despesas'
 
 const Deputado = (props) => {
-  const {deputado, selected, detailed, onClose} = props
+  const {deputado, selected, detailed, onClose, requestDespesas} = props
   const [state, setState] = React.useState()
   React.useEffect(()=>{
     if(detailed){
@@ -15,40 +15,27 @@ const Deputado = (props) => {
     }
   },[])
   return(
-    <Button onClick={props.onClick? props.onClick : null}>
-      {!detailed ?
-        <div className='retrato'>
-          <div>
-            <img src={deputado.urlFoto} style={{maxWidth: 70, borderRadius: 30}}/>
-          </div>
-          <div style={{fontSize: 12}}>{deputado.nome}</div>
-          <div style={{fontSize: 12}}>{deputado.nomeCivil}</div>
-          <div style={{fontSize: 14}}>{deputado.siglaPartido}</div>
-          <div>{deputado.siglaUf}</div>
-          
-        </div>
-      :
+    <div>
+        <Button onClick={onClose}>Fechar</Button>
+      
+      <div className='retrato'>
         <div>
-          <Button onClick={onClose}>Fechar</Button>
-          <div className='retrato'>
-            <div>
-              <img src={deputado.urlFoto} style={{maxWidth: 150, borderRadius: 30}}/>
-            </div>
-            <div style={{fontSize: 12}}>{deputado.nome}</div>
-            <div style={{fontSize: 14}}>{deputado.siglaPartido}</div>
-            <div>{deputado.siglaUf}</div>
-          </div>
-          <div className='info'>
-              {deputado.evidencia &&
-                <a href={deputado.evidencia}>Evidencia do posicionamento sobre impeachment</a>
-              }
-              <div>{deputado.tel}</div>
-              <div>{deputado.email}</div>
-          </div>
-          <Despesas id={deputado.id} uf={deputado.siglaUf}/>
+          <img src={deputado.urlFoto} style={detailed? {maxWidth: 150, borderRadius: 30} : {maxWidth: 70, borderRadius: 30}}/>
         </div>
-      }
-    </Button>
+        <div style={{fontSize: 12}}>{deputado.nome}</div>
+        <div style={{fontSize: 12}}>{deputado.nomeCivil}</div>
+        <div style={{fontSize: 14}}>{deputado.siglaPartido}</div>
+        <div>{deputado.siglaUf}</div>
+        <div className='info'>
+            <div>{deputado.tel}</div>
+            <div>{deputado.email}</div>
+        </div>
+        {deputado.despesasDownloaded? 
+          <Despesas id={deputado.id} uf={deputado.siglaUf}/>
+          : <div>Baixando despesas...</div>
+        }
+      </div>
+    </div>
   )
 }
 
